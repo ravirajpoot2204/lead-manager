@@ -54,16 +54,17 @@ const Dashboard = () => {
         }
     };
 
-    const handleAssign = async (leadId, assignTo) => {
-        try {
-            // if empty string (unassign), send null
-            const payload = assignTo ? { assignedTo: assignTo } : { assignedTo: null };
-            await API.patch(`/api/leads/${leadId}`, payload);
-            fetchLeads();
-        } catch (err) {
-            alert('Assignment failed: ' + (err.response?.data?.message || err.message));
-        }
-    };
+const handleAssign = async (leadId, assignTo) => {
+  console.log('Assigning lead:', leadId, 'to:', assignTo);
+  try {
+    const payload = assignTo ? { assignedTo: assignTo } : { assignedTo: null };
+    await API.patch(`/api/leads/${leadId}`, payload);
+    fetchLeads();
+  } catch (err) {
+    console.error('Assign error:', err.response);
+    alert('Assignment failed: ' + (err.response?.data?.message || err.message));
+  }
+};
     return (
         <Layout>
             <h2>Dashboard</h2>
@@ -118,9 +119,9 @@ const Dashboard = () => {
                                         >
                                             <option value="" disabled>Assign</option>
                                             <option value="">Unassign</option>
-                                            {/* ✅ Hardcoded member IDs – tumhare real IDs yahan daalo */}
-                                            <option value="6a64614ee753c41ee56ccf76">Member One</option>
-                                            <option value="6a64614ee753c41ee56ccf77">Member Two</option>
+                                            {members.map(m => (
+                                                <option key={m._id} value={m._id}>{m.name}</option>
+                                            ))}
                                         </select>
                                     ) : (
                                         lead.assignedTo ? lead.assignedTo.name : 'Unassigned'

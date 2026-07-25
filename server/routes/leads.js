@@ -6,9 +6,10 @@ const {
   list,
   getOne,
   update,
-  addNote
+  addNote,
+  editDetails,
+  deleteLead
 } = require('../controllers/leadController');
-
 // Public endpoint (no auth)
 router.post('/public', createPublic);
 
@@ -17,5 +18,10 @@ router.get('/', auth, list);
 router.get('/:id', auth, getOne);
 router.patch('/:id', auth, update);
 router.post('/:id/notes', auth, addNote);
+// Edit lead details (admin only)
+router.put('/:id', auth, role('admin'), leadController.editDetails);
+
+// Delete lead (admin only)
+router.delete('/:id', auth, role('admin'), leadController.deleteLead);
 
 module.exports = router; 

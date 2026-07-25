@@ -152,3 +152,39 @@ exports.addNote = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+// Edit lead details (name, email, phone, source) – admin only
+exports.editDetails = async (req, res) => {
+  try {
+    const { name, email, phone, source } = req.body;
+    const lead = await Lead.findById(req.params.id);
+    if (!lead) return res.status(404).json({ message: 'Lead not found' });
+
+    if (name) lead.name = name;
+    if (email) lead.email = email;
+    if (phone !== undefined) lead.phone = phone;
+    if (source) lead.source = source;
+
+    lead.activities.push({
+      action: 'status_changed',   // or use 'details_updated'
+      details: 'Lead details updated',
+      performedBy: req.user._id,
+      timestamp: new Date()
+    });
+
+    await lead.save();
+    res.json(lead);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// Delete a lead (admin only)
+exports.deleteLead = async (req, res) => {
+  try {
+    const lead = await Lead.findByIdAndDelete(req.params.id);
+    if (!lead) return res.status(404).json({ message: 'Lead not found' });
+    res.json({ message: 'Lead deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

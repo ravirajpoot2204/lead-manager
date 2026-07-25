@@ -1,30 +1,33 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import API from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 
 const LeadDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [lead, setLead] = useState(null);
   const [note, setNote] = useState('');
   const [members, setMembers] = useState([]);
-const [error, setError] = useState(null);
- const fetchLead = async () => {
-  try {
-    const { data } = await API.get(`/api/leads/${id}`);
-    setLead(data);
-    setError(null);
-  } catch (err) {
-    console.error('Fetch lead error:', err.response?.status, err.response?.data);
-    setError(err.response?.data?.message || 'Failed to load lead');
-  }
-};
-useEffect(() => {
-  fetchLead();
-}, [id]);
-  // Fetch real member list from the API (only for admins)
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', email: '', phone: '', source: '' });
+
+  const fetchLead = async () => {
+    try {
+      const { data } = await API.get(`/api/leads/${id}`);
+      setLead(data);
+      setEditForm({ name: data.name, email: data.email, phone: data.phone || '', source: data.source });
+    } catch (err) {
+      console.error('Fetch lead error:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchLead();
+  }, [id]);
+
   useEffect(() => {
     if (user?.role === 'admin') {
       API.get('/api/users/members')
@@ -51,13 +54,53 @@ useEffect(() => {
     fetchLead();
   };
 
-  if (error) return <Layout><p style={{color:'red'}}>Error: {error}</p></Layout>;
-if (!lead) return <Layout><p>Loading...</p></Layout>;
+  const handleEditSave = async (e) => {
+    e.preventDefault();
+    await API.put(`/api/leads/${id}`, editForm);
+    setEditing(false);
+    fetchLead();
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this lead?')) {
+      await API.delete(`/api/leads/${id}`);
+      navigate('/dashboard');
+    }
+  };
+
+  if (!lead) return <Layout><p>Loading...</p></Layout>;
 
   return (
     <Layout>
       <h2>{lead.name}</h2>
-      <p>Email: {lead.email} | Phone: {lead.phone || 'N/A'} | Source: {lead.source}</p>
+      {user?.role === 'admin' && (
+        <div style={{ marginBottom: '1rem' }}>
+          {!editing ? (
+            <button onClick={() => setEditing(true)}>Edit Details</button>
+          ) : (
+            <button onClick={() => setEditing(false)}>Cancel Edit</button>
+          )}
+          <button onClick={handleDelete} style={{ marginLeft: '1rem', background: 'red', color: 'white' }}>
+            Delete Lead
+          </button>
+        </div>
+      )}
+
+      {editing ? (
+        <form onSubmit={handleEditSave}>
+          <input value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Name" required />
+          <input value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} placeholder="Email" required />
+          <input value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} placeholder="Phone" />
+          <select value={editForm.source} onChange={e => setEditForm({...editForm, source: e.target.value})}>
+            <option value="website">Website</option>
+            <option value="referral">Referral</option>
+            <option value="social">Social Media</option>
+          </select>
+          <button type="submit">Save</button>
+        </form>
+      ) : (
+        <p>Email: {lead.email} | Phone: {lead.phone || 'N/A'} | Source: {lead.source}</p>
+      )}
 
       <p>Status:
         <select value={lead.status} onChange={e => handleStatusChange(e.target.value)}>
@@ -68,28 +111,17 @@ if (!lead) return <Layout><p>Loading...</p></Layout>;
 
       <p>Assigned to:
         {user?.role === 'admin' ? (
-          <select
-            value={lead.assignedTo?._id || ''}
-            onChange={e => handleAssign(e.target.value)}
-          >
+          <select value={lead.assignedTo?._id || ''} onChange={e => handleAssign(e.target.value)}>
             {lead.assignedTo ? (
               <>
-                <option value="" disabled>
-                  Assigned to: {lead.assignedTo.name}
-                </option>
+                <option value="" disabled>Assigned to: {lead.assignedTo.name}</option>
                 <option value="">Unassign</option>
               </>
             ) : (
-              <option value="" disabled>
-                Unassigned
-              </option>
+              <option value="" disabled>Unassigned</option>
             )}
             {members.map(m => (
-              <option
-                key={m._id}
-                value={m._id}
-                disabled={lead.assignedTo?._id === m._id}
-              >
+              <option key={m._id} value={m._id} disabled={lead.assignedTo?._id === m._id}>
                 {m.name}
               </option>
             ))}

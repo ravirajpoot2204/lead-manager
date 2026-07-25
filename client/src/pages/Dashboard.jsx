@@ -118,9 +118,9 @@ const Dashboard = () => {
                                         >
                                             <option value="" disabled>Assign</option>
                                             <option value="">Unassign</option>
-                                            {members.map(m => (
-                                                <option key={m._id} value={m._id}>{m.name}</option>
-                                            ))}
+                                            {/* ✅ Hardcoded member IDs – tumhare real IDs yahan daalo */}
+                                            <option value="6a64614ee753c41ee56ccf76">Member One</option>
+                                            <option value="6a64614ee753c41ee56ccf77">Member Two</option>
                                         </select>
                                     ) : (
                                         lead.assignedTo ? lead.assignedTo.name : 'Unassigned'

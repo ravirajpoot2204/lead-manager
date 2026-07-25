@@ -110,23 +110,42 @@ const handleAssign = async (leadId, assignTo) => {
                                         <option>Proposal</option><option>Negotiation</option><option>Won</option><option>Lost</option>
                                     </select>
                                 </td>
-                                <td>
-                                    {user?.role === 'admin' ? (
-                                        <select
-                                            value={lead.assignedTo?._id || ''}
-                                            onChange={e => handleAssign(lead._id, e.target.value)}
-                                        >
-                                            <option value="" disabled>Assign</option>
-                                            <option value="">Unassign</option>
-                                            {members.map(m => (
-                                                <option key={m._id} value={m._id}>{m.name}</option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        lead.assignedTo ? lead.assignedTo.name : 'Unassigned'
-                                    )}
-                                </td>
-                                <td><Link to={`/leads/${lead._id}`}>View</Link></td>
+                               <td>
+  {user?.role === 'admin' ? (
+    <select
+      value={lead.assignedTo?._id || ''}
+      onChange={e => handleAssign(lead._id, e.target.value)}
+    >
+      {/* If assigned, show a disabled label + Unassign option */}
+      {lead.assignedTo ? (
+        <>
+          <option value="" disabled>
+            Assigned to: {lead.assignedTo.name}
+          </option>
+          <option value="">Unassign</option>
+        </>
+      ) : (
+        /* If unassigned, show only a disabled placeholder */
+        <option value="" disabled>
+          Unassigned
+        </option>
+      )}
+      {/* List all members, disable the currently assigned one */}
+      {members.map(m => (
+        <option
+          key={m._id}
+          value={m._id}
+          disabled={lead.assignedTo?._id === m._id}
+        >
+          {m.name}
+        </option>
+      ))}
+    </select>
+  ) : (
+    /* For members – just show plain text */
+    lead.assignedTo ? lead.assignedTo.name : 'Unassigned'
+  )}
+</td> <td><Link to={`/leads/${lead._id}`}>View</Link></td>
                             </tr>
                         ))}
                     </tbody>

@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const leadRoutes = require('./routes/leads');
 
@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
-
+app.use('/api/users', userRoutes);
 app.get('/', (req, res) => {
   res.send('Lead Manager API Running');
 });

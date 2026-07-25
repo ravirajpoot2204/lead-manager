@@ -14,14 +14,13 @@ const Dashboard = () => {
     const [members, setMembers] = useState([]);
 
     // Set real member IDs
-    useEffect(() => {
-        if (user?.role === 'admin') {
-            setMembers([
-                { _id: '6a64614ee753c41ee56ccf76', name: 'Member One' },
-                { _id: '6a64614ee753c41ee56ccf77', name: 'Member Two' }
-            ]);
-        }
-    }, [user]);
+ useEffect(() => {
+  if (user?.role === 'admin') {
+    API.get('/api/users/members')
+      .then(({ data }) => setMembers(data))
+      .catch(err => console.error('Failed to fetch members:', err));
+  }
+}, [user]);
 
     const fetchLeads = useCallback(async () => {
         setLoading(true);

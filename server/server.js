@@ -7,7 +7,7 @@ const authRoutes = require('./routes/auth');
 const leadRoutes = require('./routes/leads');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: ['http://localhost:5173', 'https://lead-manager-eta-black.vercel.app'] }));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

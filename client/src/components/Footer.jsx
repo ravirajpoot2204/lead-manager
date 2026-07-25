@@ -10,7 +10,7 @@ const Footer = () => (
   }}>
     <span>Built by </span>
     <a
-      href="https://instagram.com/ravirajput71727"
+      href="https://instagram.com/ravirajpoot2204"
       target="_blank"
       rel="noopener noreferrer"
       style={{ color: '#e94560', fontWeight: 'bold', textDecoration: 'none' }}

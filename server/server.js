@@ -7,8 +7,9 @@ const authRoutes = require('./routes/auth');
 const leadRoutes = require('./routes/leads');
 
 const app = express();
-
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://your-vercel-app.vercel.app']
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

@@ -1,4 +1,4 @@
-const Lead = require('../models/Lead');
+const Lead = require('../models/lead');
 
 // Public lead capture – no auth required
 exports.createPublic = async (req, res) => {

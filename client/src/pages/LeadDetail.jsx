@@ -10,12 +10,20 @@ const LeadDetail = () => {
   const [lead, setLead] = useState(null);
   const [note, setNote] = useState('');
   const [members, setMembers] = useState([]);
-
-  const fetchLead = async () => {
+const [error, setError] = useState(null);
+ const fetchLead = async () => {
+  try {
     const { data } = await API.get(`/api/leads/${id}`);
     setLead(data);
-  };
-
+    setError(null);
+  } catch (err) {
+    console.error('Fetch lead error:', err.response?.status, err.response?.data);
+    setError(err.response?.data?.message || 'Failed to load lead');
+  }
+};
+useEffect(() => {
+  fetchLead();
+}, [id]);
   // Fetch real member list from the API (only for admins)
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -43,7 +51,8 @@ const LeadDetail = () => {
     fetchLead();
   };
 
-  if (!lead) return <Layout><p>Loading...</p></Layout>;
+  if (error) return <Layout><p style={{color:'red'}}>Error: {error}</p></Layout>;
+if (!lead) return <Layout><p>Loading...</p></Layout>;
 
   return (
     <Layout>

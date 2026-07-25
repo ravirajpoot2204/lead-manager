@@ -47,4 +47,4 @@ describe('Lead assignment and status flow', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.status).toBe('Contacted');
   });
-});
+}); 

@@ -32,4 +32,4 @@ describe('Auth API', () => {
       .send({ email: 'admin@test.com', password: 'wrong' });
     expect(res.statusCode).toBe(401);
   });
-});
+}); 

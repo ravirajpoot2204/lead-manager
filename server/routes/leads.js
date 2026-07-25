@@ -18,4 +18,4 @@ router.get('/:id', auth, getOne);
 router.patch('/:id', auth, update);
 router.post('/:id/notes', auth, addNote);
 
-module.exports = router;
+module.exports = router; 

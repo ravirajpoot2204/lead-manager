@@ -8,7 +8,7 @@ exports.createPublic = async (req, res) => {
       name,
       email,
       phone,
-      source,
+      source, 
       activities: [{
         action: 'created',
         details: 'Lead created via public form',
